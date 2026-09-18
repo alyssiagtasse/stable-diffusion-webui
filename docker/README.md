@@ -108,3 +108,11 @@ docker run -d \
 ```
 
 Then connect as root: `ssh -p 2222 root@<host>`
+
+<hr>
+
+## Runpod
+
+When a volume is attached, Runpod provides persistent storage at `/workspace`. On startup, the container detects `/workspace` and relocates the data directories there via symlinks, so **models, output, extensions and config** persist across pod restarts. The web app and venv stay inside the container and are reinstalled on the first start after a rebuild.
+
+No extra configuration is needed - just make sure a volume is attached to the pod.
