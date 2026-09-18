@@ -29,6 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libgomp1 \
         libtcmalloc-minimal4 \
         openssh-server \
+        wget \
     && rm -rf /var/lib/apt/lists/*
 
 # SSH (root login via public key only)
