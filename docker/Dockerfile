@@ -28,7 +28,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libglib2.0-0 \
         libgomp1 \
         libtcmalloc-minimal4 \
+        openssh-server \
     && rm -rf /var/lib/apt/lists/*
+
+# SSH (root login via public key only)
+RUN mkdir -p /run/sshd \
+    && printf '%s\n' \
+        'PermitRootLogin without-password' \
+        'PasswordAuthentication no' \
+        'PubkeyAuthentication yes' \
+        > /etc/ssh/sshd_config.d/50-root.conf
 
 # Non-Root User (UID 99 / GID 100 = nobody:users)
 RUN groupadd -g 100 users 2>/dev/null || true \
@@ -68,13 +77,17 @@ RUN mkdir -p \
         output
 
 # Runtime
+COPY init.sh /usr/local/bin/init.sh
 COPY --chown=99:100 entrypoint.sh /home/forge/sd-webui/entrypoint.sh
-RUN chmod +x /home/forge/sd-webui/entrypoint.sh
+RUN chmod +x /usr/local/bin/init.sh /home/forge/sd-webui/entrypoint.sh
 
+USER root
+
+EXPOSE 22
 EXPOSE 7860
 
 # extra time for prepare_environment() to run on first start
 HEALTHCHECK --interval=30s --timeout=10s --start-period=300s --retries=15 \
     CMD curl -f http://localhost:7860/ || exit 1
 
-ENTRYPOINT ["/home/forge/sd-webui/entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/init.sh"]

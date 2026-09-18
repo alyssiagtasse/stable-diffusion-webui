@@ -79,14 +79,32 @@ docker pull oromis995/sd-forge-neo:latest
 		<td>Latest (<code>cu126</code>)</td>
 	</tr>
 	<tr>
-		<td>User</td>
-		<td><code>forge</code> (UID 99 / GID 100)</td>
-	</tr>
-	<tr>
-		<td>Port</td>
-		<td>7860</td>
-	</tr>
+	<td>User</td>
+	<td><code>forge</code> (UID 99 / GID 100)</td>
+</tr>
+<tr>
+	<td>Ports</td>
+	<td><code>22</code> (SSH) / <code>7860</code> (WebUI)</td>
+</tr>
 </table>
 
 > [!Note]
 > On the first run, `prepare_environment()` will install requirements and dependencies. This may take a few minutes
+
+<hr>
+
+## SSH
+
+The container starts an `sshd` that allows **root** login via **public key** only (no password). The WebUI itself still runs as the `forge` user.
+
+Provide your public key with the `SSH_ROOT_PUBKEY` environment variable (or bind-mount a file to `/root/.ssh/authorized_keys`):
+
+```bash
+docker run -d \
+    --gpus all \
+    -p 2222:22 -p 7860:7860 \
+    -e SSH_ROOT_PUBKEY="ssh-ed25519 AAAA... user@host" \
+    ...
+```
+
+Then connect as root: `ssh -p 2222 root@<host>`
