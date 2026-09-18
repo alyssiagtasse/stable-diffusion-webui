@@ -116,3 +116,18 @@ Then connect as root: `ssh -p 2222 root@<host>`
 When a volume is attached, Runpod provides persistent storage at `/workspace`. On startup, the container detects `/workspace` and relocates the data directories there via symlinks, so **models, output, extensions and config** persist across pod restarts. The web app and venv stay inside the container and are reinstalled on the first start after a rebuild.
 
 No extra configuration is needed - just make sure a volume is attached to the pod.
+
+<hr>
+
+## Provisioning
+
+Set the `PROVISIONING_SCRIPT` environment variable to a script URL (or a path inside the container) to run custom setup before the WebUI starts - for example downloading models into `/workspace`:
+
+```bash
+docker run -d \
+    --gpus all \
+    -e PROVISIONING_SCRIPT="https://example.com/setup.sh" \
+    ...
+```
+
+The script is downloaded with `curl` and executed as the `forge` user, right before `launch.py`. If it exits with a non-zero code, the container stops.

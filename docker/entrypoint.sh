@@ -18,6 +18,18 @@ for f in config.json ui-config.json styles.csv user.css; do
     ln -sf /home/forge/sd-webui/config/$f /home/forge/sd-webui/$f
 done
 
+# Optional provisioning script (URL or local path), run before the WebUI
+if [[ -n "${PROVISIONING_SCRIPT:-}" ]]; then
+    PROVISION="/tmp/provision.sh"
+    if [[ -f "$PROVISIONING_SCRIPT" ]]; then
+        cp "$PROVISIONING_SCRIPT" "$PROVISION"
+    else
+        curl -fsSL "$PROVISIONING_SCRIPT" -o "$PROVISION"
+    fi
+    chmod +x "$PROVISION"
+    bash "$PROVISION"
+fi
+
 exec python /home/forge/sd-webui/launch.py \
     --listen \
     "${EXTRA_ARGS[@]}" \
