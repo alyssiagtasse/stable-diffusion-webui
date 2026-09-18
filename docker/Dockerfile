@@ -77,9 +77,8 @@ RUN mkdir -p \
         output
 
 # Runtime
-COPY init.sh /usr/local/bin/init.sh
-COPY --chown=99:100 entrypoint.sh /home/forge/sd-webui/entrypoint.sh
-RUN chmod +x /usr/local/bin/init.sh /home/forge/sd-webui/entrypoint.sh
+COPY --chmod=0755 init.sh /usr/local/bin/init.sh
+COPY --chown=99:100 --chmod=0755 entrypoint.sh /home/forge/sd-webui/entrypoint.sh
 
 USER root
 
