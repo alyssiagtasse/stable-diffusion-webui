@@ -1,0 +1,58 @@
+name: GHCR Cleanup
+
+# Weekly: delete old image versions from ghcr.io, keeping the most recent ones
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  packages: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete old image versions
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          KEEP_RECENT: 5
+          CUTOFF_DAYS: 30
+        run: |
+          set -euo pipefail
+
+          PACKAGE="${GITHUB_REPOSITORY#*/}"
+          PACKAGE="${PACKAGE,,}"
+          PROTECTED="latest main master"
+
+          if ! gh api --paginate "/user/packages/container/${PACKAGE}/versions" \
+              --jq '.[] | "\(.id)|\(.updated_at)|\(.metadata.container.tags // [] | join(","))"' \
+              | sort -t'|' -k2,2r > /tmp/versions.txt; then
+            echo "No package versions found (image not published yet)" >&2
+            exit 0
+          fi
+
+          CUTOFF=$(date -u -d "${CUTOFF_DAYS} days ago" +%s)
+          recent=0
+          deleted=0
+          read -ra PROT <<< "$PROTECTED"
+
+          while IFS='|' read -r id updated tags; do
+            recent=$((recent + 1))
+            epoch=$(date -u -d "$updated" +%s)
+            # keep the newest versions, and anything updated within the cutoff window
+            if (( recent <= KEEP_RECENT )) || (( epoch >= CUTOFF )); then
+              continue
+            fi
+            for p in "${PROT[@]}"; do
+              if [[ ",${tags}," == *",${p},"* ]]; then
+                echo "Keeping ${id} (protected tag: ${p})"
+                continue 2
+              fi
+            done
+            echo "Deleting version ${id} (updated ${updated}, tags: ${tags:-none})"
+            gh api -X DELETE "/user/packages/container/${PACKAGE}/versions/${id}"
+            deleted=$((deleted + 1))
+          done < /tmp/versions.txt
+
+          echo "Done: ${deleted} version(s) deleted"
