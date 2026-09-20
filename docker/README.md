@@ -68,7 +68,7 @@ docker pull oromis995/sd-forge-neo:latest
 <table>
 	<tr>
 		<td>Base</td>
-		<td><code>nvidia/cuda:12.6.3-runtime-ubuntu22.04</code></td>
+		<td><code>nvidia/cuda:12.8.1-runtime-ubuntu22.04</code></td>
 	</tr>
 	<tr>
 		<td>Python</td>
@@ -76,7 +76,7 @@ docker pull oromis995/sd-forge-neo:latest
 	</tr>
 	<tr>
 		<td>PyTorch</td>
-		<td>Latest (<code>cu126</code>)</td>
+		<td>Latest (<code>cu128</code>)</td>
 	</tr>
 	<tr>
 	<td>User</td>
@@ -90,6 +90,14 @@ docker pull oromis995/sd-forge-neo:latest
 
 > [!Note]
 > On the first run, `prepare_environment()` will install requirements and dependencies. This may take a few minutes
+
+> [!Note]
+> The default build targets Blackwell GPUs (RTX 50xx / `sm_120`), which require CUDA 12.8+.
+> For older GPUs, build with the previous versions:
+>
+> ```bash
+> docker build --build-arg CUDA_VERSION=12.6.3 --build-arg TORCH_INDEX=cu126 -t forge-neo-local .
+> ```
 
 <hr>
 

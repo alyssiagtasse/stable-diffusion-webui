@@ -1,12 +1,13 @@
 # syntax=docker/dockerfile:1
 # Forge Neo | NVIDIA GPU
 
-ARG CUDA_VERSION=12.6.3
+# CUDA 12.8+ is required for Blackwell GPUs (RTX 50xx, sm_120)
+ARG CUDA_VERSION=12.8.1
 
 FROM nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu22.04
 
 # See: https://download.pytorch.org/whl/
-ARG TORCH_INDEX=cu126
+ARG TORCH_INDEX=cu128
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
