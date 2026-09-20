@@ -1,10 +1,11 @@
 name: GHCR Cleanup
 
-# Weekly: delete old image versions from ghcr.io, keeping the most recent ones
+# Weekly / manual / reusable (called after Docker builds)
 on:
   schedule:
     - cron: "0 6 * * 1"
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   packages: write

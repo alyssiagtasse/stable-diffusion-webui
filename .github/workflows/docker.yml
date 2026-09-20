@@ -74,3 +74,11 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=${{ matrix.variant }}
           cache-to: type=gha,mode=max,scope=${{ matrix.variant }}
+
+  cleanup:
+    needs: build
+    if: github.event_name != 'pull_request'
+    uses: ./.github/workflows/ghcr-cleanup.yml
+    permissions:
+      packages: write
+    secrets: inherit
