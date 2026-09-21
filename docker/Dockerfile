@@ -1,13 +1,15 @@
 # syntax=docker/dockerfile:1
 # Forge Neo | NVIDIA GPU
 
-# CUDA 12.8+ is required for Blackwell GPUs (RTX 50xx, sm_120)
-ARG CUDA_VERSION=12.8.1
+# CUDA 13 / sm_120 for Blackwell GPUs (RTX 50xx)
+ARG CUDA_VERSION=13.0.2
 
 FROM nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu22.04
 
 # See: https://download.pytorch.org/whl/
-ARG TORCH_INDEX=cu128
+ARG TORCH_INDEX=cu130
+ARG TORCH_VERSION=2.14.0
+ARG TORCHVISION_VERSION=0.29.0
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
@@ -66,7 +68,7 @@ ENV VIRTUAL_ENV="/home/forge/sd-webui/venv" \
     PYTHON="/home/forge/sd-webui/venv/bin/python3.13"
 
 # PyTorch Pre-Install
-RUN uv pip install torch torchvision \
+RUN uv pip install "torch==${TORCH_VERSION}" "torchvision==${TORCHVISION_VERSION}" \
     --index-url "https://download.pytorch.org/whl/${TORCH_INDEX}"
 
 # Persistent Data Directories
