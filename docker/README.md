@@ -68,7 +68,7 @@ docker pull oromis995/sd-forge-neo:latest
 <table>
 	<tr>
 		<td>Base</td>
-		<td><code>nvidia/cuda:13.0.2-runtime-ubuntu22.04</code></td>
+		<td><code>nvidia/cuda:13.0.2-runtime-ubuntu24.04</code> (cu128 variant: <code>12.8.1</code>)</td>
 	</tr>
 	<tr>
 		<td>Python</td>

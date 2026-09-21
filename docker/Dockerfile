@@ -4,7 +4,7 @@
 # CUDA 13 / sm_120 for Blackwell GPUs (RTX 50xx)
 ARG CUDA_VERSION=13.0.2
 
-FROM nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu22.04
+FROM nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu24.04
 
 # See: https://download.pytorch.org/whl/
 ARG TORCH_INDEX=cu130
@@ -28,9 +28,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ffmpeg \
         git \
         libgl1 \
-        libglib2.0-0 \
+        libglib2.0-0t64 \
         libgomp1 \
-        libtcmalloc-minimal4 \
+        libtcmalloc-minimal4t64 \
         openssh-server \
         rsync \
         wget \
