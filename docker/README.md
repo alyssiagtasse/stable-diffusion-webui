@@ -94,6 +94,9 @@ docker pull oromis995/sd-forge-neo:latest
 > [!Note]
 > The default build targets Blackwell GPUs (RTX 50xx / `sm_120`) and requires NVIDIA driver `580+` (CUDA 13). Maxwell, Pascal and Volta GPUs are no longer supported.
 
+> [!Note]
+> A CUDA 12.8 variant is also published with the `-cu128` tag suffix (e.g. `main-cu128`, `latest-cu128`), using PyTorch `2.11.0` (the last release built for cu128). Use it if your NVIDIA driver is stuck on `570`–`579` and cannot run CUDA 13.
+
 <hr>
 
 ## SSH

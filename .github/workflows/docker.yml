@@ -18,6 +18,25 @@ jobs:
       contents: read
       packages: write
 
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Default: CUDA 13 / PyTorch 2.14 (Blackwell sm_120 included)
+          - variant: cu130
+            CUDA_VERSION: 13.0.2
+            TORCH_INDEX: cu130
+            TORCH_VERSION: 2.14.0
+            TORCHVISION_VERSION: 0.29.0
+            suffix: ""
+          # CUDA 12.8 for NVIDIA drivers 570-579 (last torch built for cu128)
+          - variant: cu128
+            CUDA_VERSION: 12.8.1
+            TORCH_INDEX: cu128
+            TORCH_VERSION: 2.11.0
+            TORCHVISION_VERSION: 0.26.0
+            suffix: "-cu128"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -38,6 +57,8 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          flavor: |
+            suffix=${{ matrix.suffix }}
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
@@ -51,14 +72,14 @@ jobs:
           file: ./docker/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           build-args: |
-            CUDA_VERSION=13.0.2
-            TORCH_INDEX=cu130
-            TORCH_VERSION=2.14.0
-            TORCHVISION_VERSION=0.29.0
+            CUDA_VERSION=${{ matrix.CUDA_VERSION }}
+            TORCH_INDEX=${{ matrix.TORCH_INDEX }}
+            TORCH_VERSION=${{ matrix.TORCH_VERSION }}
+            TORCHVISION_VERSION=${{ matrix.TORCHVISION_VERSION }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.variant }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.variant }}
 
   cleanup:
     needs: build
